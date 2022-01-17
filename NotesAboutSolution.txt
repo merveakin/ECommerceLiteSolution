@@ -1,0 +1,13 @@
+--for all project (hepsine)--
+install-package Entityframework	//UI BLL ve DAL
+install-package Microsoft.aspnet.Identity.core	//uý BLL DAL
+install-package Microsoft.aspnet.Identity.EntityFramework	  //uý BLL DAL
+install-package Newtonsoft.Json	//KURMADIK
+install-package Microsoft.aspnet.Identity.Owin	//uý BLL DAL
+
+--only for UI project (sadece UI)--
+install-package Microsoft.Owin	//KURULDU
+install-package Microsoft.Owin.Security	//KURULDU
+install-package Microsoft.Owin.Security.Cookies	//KURULDU
+install-package Microsoft.Owin.Security.OAuth	//KURULDU
+install-package Microsoft.Owin.Host.SystemWeb	//KURULDU
