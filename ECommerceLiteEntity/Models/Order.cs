@@ -17,6 +17,6 @@ namespace ECommerceLiteEntity.Models
         public string CustomerTCNumber { get; set; }
         [ForeignKey("CustomerTCNumber")]
         public virtual Customer Customer { get; set; }
-        public virtual List<Order> OrderList { get; set; }
+        public virtual List<OrderDetail> OrderDetailList { get; set; }
     }
 }
