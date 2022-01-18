@@ -210,8 +210,7 @@ namespace ECommerceLiteUI.Controllers
                 }
                 if (theUser.Roles.FirstOrDefault().RoleId == myRoleManager.FindByName(Enum.GetName(typeof(TheIdentityRoles), TheIdentityRoles.Passive)).Id)
                 {
-                    ViewBag.TheResult = "In order to use the system, you need to activate your membership. You can activate by clicking the activation link sent to your email!
-";
+                    ViewBag.TheResult = "In order to use the system, you need to activate your membership. You can activate by clicking the activation link sent to your email!";
                     return View(model);
                 }
                 var authManager = HttpContext.GetOwinContext().Authentication;
