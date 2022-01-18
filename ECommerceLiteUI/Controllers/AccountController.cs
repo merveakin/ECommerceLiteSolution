@@ -227,7 +227,6 @@ namespace ECommerceLiteUI.Controllers
                 if (theUser.Roles.FirstOrDefault().RoleId == myRoleManager.FindByName(Enum.GetName(typeof(TheIdentityRoles), TheIdentityRoles.Customer)).Id)
                 {
                     return RedirectToAction("Index", "Home");
-
                 }
 
                 if (string.IsNullOrEmpty(model.ReturnUrl))
@@ -250,6 +249,71 @@ namespace ECommerceLiteUI.Controllers
                 return View(model);
 
             }
+        }
+
+        [HttpGet]
+        public ActionResult UpdatePassword()
+        {
+
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdatePassword(ProfileViewModel model)
+        {
+            try
+            {
+                if (model.NewPassword!=model.ConfirmNewPassword)
+                {
+                    ModelState.AddModelError("", "Passwords do not match!");
+
+                    //TODO :   Profile göndermişiz ?
+
+                    return View(model);
+                }
+
+                var theUser = myUserManager
+                    .FindById(HttpContext.User.Identity.GetUserId());
+
+                var theCheckUser = myUserManager.Find(theUser.UserName,model.OldPassword);
+
+                if (theCheckUser==null)
+                {
+                    ModelState.AddModelError("", "You entered your current password incorrectly!");
+                    //TODO :   Profile göndermişiz ?
+                    return View();
+                }
+
+                await myUserStore.SetPasswordHashAsync(theUser, myUserManager.PasswordHasher.HashPassword(model.NewPassword));
+                await myUserStore.UpdateAsync(theUser);
+                await myUserStore.Context.SaveChangesAsync();
+                TempData["PasswordUpdated"]= "Your password has been changed.";
+                HttpContext.GetOwinContext().Authentication.SignOut();
+                return RedirectToAction("Login", "Account", new { email = theUser.Email });
+
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Unexpected error occurred.");
+                return View(model);
+                //TODO : ex loglanacak
+            }
+        }
+
+        [Authorize]
+        public ActionResult UserProfile()
+        {
+            var theUser = myUserManager.FindById(HttpContext.User.Identity.GetUserId());
+            var model = new ProfileViewModel()
+            {
+                Email = theUser.Email,
+                Name = theUser.Name,
+                Surname = theUser.Surname,
+                Username = theUser.UserName
+            };
+            return View(model);
         }
     }
 }
