@@ -67,7 +67,10 @@ namespace ECommerceLiteUI.Controllers
                     Name = model.Name,
                     Surname = model.Surname,
                     Email = model.Email,
-                    ActivationCode = theActivationCode
+                    ActivationCode = theActivationCode,
+                    UserName = model.Email,
+                    //TODO : Yarın düzenlenecek >> 20.01.2022
+                    PhoneNumber = "05392609129"
                 };
                 var theResult = myUserManager.CreateAsync(newUser, model.Password);
 
@@ -108,7 +111,7 @@ namespace ECommerceLiteUI.Controllers
             catch (Exception ex)
             {
                 //TODO : Ex_Loglama
-                ModelState.AddModelError("", "An unexpected error occurred");
+                ModelState.AddModelError("", "Unexpected error occurred");
                 return View(model);
             }
         }
