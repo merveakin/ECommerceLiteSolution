@@ -12,8 +12,8 @@ namespace ECommerceLiteBLL.Settings
     public static class SiteSettings
     {
         //TODO : Mail'i webconfig dosyasından çekmeyi de öğreneceğiz.
-        public static string SiteMail { get; set; } = "";
-        public static string SiteMailPassword { get; set; } = "";
+        public static string SiteMail { get; set; } = "yazilim103@gmail.com";
+        public static string SiteMailPassword { get; set; } = "betulaksan103";
         public static string SiteMailSmtpHost = "smtp.gmail.com";
         public static int SiteMailSmtpPort = 587;
         public static bool SiteMailEnableSsl = true;
