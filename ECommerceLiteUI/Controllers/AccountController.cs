@@ -265,7 +265,7 @@ namespace ECommerceLiteUI.Controllers
         {
             try
             {
-                if (model.NewPassword!=model.ConfirmNewPassword)
+                if (model.NewPassword != model.ConfirmNewPassword)
                 {
                     ModelState.AddModelError("", "Passwords do not match!");
 
@@ -277,9 +277,9 @@ namespace ECommerceLiteUI.Controllers
                 var theUser = myUserManager
                     .FindById(HttpContext.User.Identity.GetUserId());
 
-                var theCheckUser = myUserManager.Find(theUser.UserName,model.OldPassword);
+                var theCheckUser = myUserManager.Find(theUser.UserName, model.OldPassword);
 
-                if (theCheckUser==null)
+                if (theCheckUser == null)
                 {
                     ModelState.AddModelError("", "You entered your current password incorrectly!");
                     //TODO :   Profile göndermişiz ?
@@ -289,7 +289,7 @@ namespace ECommerceLiteUI.Controllers
                 await myUserStore.SetPasswordHashAsync(theUser, myUserManager.PasswordHasher.HashPassword(model.NewPassword));
                 await myUserStore.UpdateAsync(theUser);
                 await myUserStore.Context.SaveChangesAsync();
-                TempData["PasswordUpdated"]= "Your password has been changed.";
+                TempData["PasswordUpdated"] = "Your password has been changed.";
                 HttpContext.GetOwinContext().Authentication.SignOut();
                 return RedirectToAction("Login", "Account", new { email = theUser.Email });
 
@@ -303,6 +303,7 @@ namespace ECommerceLiteUI.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         public ActionResult UserProfile()
         {
             var theUser = myUserManager.FindById(HttpContext.User.Identity.GetUserId());
@@ -314,6 +315,94 @@ namespace ECommerceLiteUI.Controllers
                 Username = theUser.UserName
             };
             return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UserProfile(ProfileViewModel model)
+        {
+            try
+            {
+                var theUser = myUserManager.FindById(HttpContext.User.Identity.GetUserId());
+                if (theUser == null)
+                {
+                    ModelState.AddModelError("", "Cannot process because the user is not found!");  //Kullanıcı bulunamadığı için işlem yapılamıyor.
+                    return View(model);
+                }
+
+                theUser.Name = model.Name;
+                theUser.Surname = model.Surname;
+                //TODO: telefon numarası eklenebilir.
+
+                await myUserStore.UpdateAsync(theUser);
+                await myUserStore.Context.SaveChangesAsync();
+                ViewBag.TheResult = "Your information has been updated.";
+                var newModel = new ProfileViewModel()
+                {
+                    Email = theUser.Email,
+                    Name = theUser.Name,
+                    Surname = theUser.Surname,
+                    Username = theUser.UserName
+                };
+                return View(newModel);
+
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Unexpected error occurred. ERROR : " + ex.Message);
+                return View(model);
+
+                //TODO : ex loglanacak
+            }
+        }
+
+        [HttpGet]
+        public ActionResult RecoverPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RecoverPassword(ProfileViewModel model)
+        {
+            try
+            {
+                var theUser = myUserStore.Context.Set<ApplicationUser>().FirstOrDefault(x => x.Email == model.Email);
+                if (theUser == null)
+                {
+                    ViewBag.TheResult = "Since there is no such user in the system, we cannot renew the password. Please register in the system first!";    //Sistemde böyle bir kullanıcı olmadığı için şifre yenileyemiyoruz.Lütfen önce sisteme kayıt olunuz!
+                    return View(model);
+                }
+
+                var randomPassword = CreateRandomNewPassword();
+                await myUserStore.SetPasswordHashAsync(theUser, myUserManager.PasswordHasher.HashPassword(randomPassword));
+                await myUserStore.UpdateAsync(theUser);
+                string siteUrl = Request.Url.Scheme + Uri.SchemeDelimiter + Request.Url.Host +
+(Request.Url.IsDefaultPort ? "" : ":" + Request.Url.Port);
+                await SiteSettings.SendMail(new MailModel()
+                {
+                    To = theUser.Email,
+                    Subject = "ECommerceLite Site-Password Changed.",
+                    Message = $"Hi {theUser.Name} {theUser.Surname} <br/>New Password: <b>{randomPassword}</b>" +
+                    $"Click <b><a href='{siteUrl}/Account/Login?email={theUser.UserName}'>HERE</a></b> to login to the system."
+                });
+                ViewBag.TheResult = "Your new password has been sent to your e-mail address.";
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.TheResult = "System error occurred! TRY AGAIN!";
+                return View(model);
+            }
+        }
+
+        [Authorize]
+        public ActionResult Logout()
+        {
+            HttpContext.GetOwinContext().Authentication.SignOut();
+            return RedirectToAction("Login", "Account");
         }
     }
 }
