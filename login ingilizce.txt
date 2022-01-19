@@ -1,0 +1,65 @@
+@using ECommerceLiteUI.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+
+<div class="row margin-vert-30">
+    <!-- Login start  -->
+    <div class="col-md-6 col-md-offset-3 col-sm-offset-3">
+        @Html.ValidationSummary()
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+            if (ViewBag.TheResult != null)
+            {
+                <h4 class="text-center text-danger">@ViewBag.TheResult</h4> <br />
+            }
+            if (ViewBag.updateSifre != null)
+            {
+                <h4 class="text-center text-danger">@ViewBag.updateSifre</h4> <br />
+            }
+            <div class="login-header margin-bottom-30" align="center">
+                <h2 class="text-center">You Can Login Now</h2>
+            </div> <br />
+            <div class="input-group margin-bottom-20">
+                <span class="input-group-addon">
+                    <i class="fa fa-user"></i>
+                </span>
+                @if (ViewBag.Email != null)
+                {
+                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control", placeholder = ViewBag.Email })
+                }
+                else
+                {
+                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control", placeholder = "Your Email.." })
+                    @Html.ValidationMessageFor(x => x.Email)
+                }
+            </div> <br />
+            <div class="input-group margin-bottom-20">
+                <span class="input-group-addon">
+                    <i class="fa fa-lock"></i>
+                </span>
+                @Html.TextBoxFor(x => x.Password, new { @class = "form-control", type = "password", placeholder = "Password..." })
+                @Html.ValidationMessageFor(x => x.Password)
+            </div> <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <span>Remember Me</span>
+                    @Html.CheckBoxFor(x => x.RememberMe)
+                </div>
+                <div class="col-md-6">
+                    <button type="submit" class="btn btn-info pull-right">LOGIN</button> <br />
+                </div>
+            </div> <br />
+            <hr>
+            <h4 align="center">Forgot your password?</h4>
+            <p align="center">
+                @Html.ActionLink("Click HERE for Your New Password Request", "RecoverPassword", "Account", new { n = Model.Email }, null)
+            </p>
+        }
+    </div>
+    <!-- Login End -->
+
+</div>
