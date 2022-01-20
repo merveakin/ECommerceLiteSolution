@@ -83,7 +83,8 @@ namespace ECommerceLiteUI.Controllers
                     {
                         TCNumber = model.TCNumber,
                         UserId = newUser.Id,
-                        TargetRole = TheIdentityRoles.Customer
+                        TargetRole = TheIdentityRoles.Customer,
+                        LastActiveTime=DateTime.Now
                     };
                     myPassiveUserRepo.Insert(newPassiveUser);
                     string siteUrl =
@@ -146,7 +147,8 @@ namespace ECommerceLiteUI.Controllers
                         Customer newCustomer = new Customer()
                         {
                             TCNumber = thePassiveUser.TCNumber,
-                            UserId = theUser.Id
+                            UserId = theUser.Id,
+                            LastActiveTime = DateTime.Now
                         };
                         myCustomerRepo.Insert(newCustomer);
                         //Passive Tablosundan bu kayıt silinsin.
@@ -175,10 +177,10 @@ namespace ECommerceLiteUI.Controllers
         {
             try
             {
-                if (HttpContext.User.Identity.IsAuthenticated)
+                if (HttpContext.User.Identity.IsAuthenticated && ReturnUrl != null)
                 {
                     var url = ReturnUrl.Split('/');
-                    //TODO : devam edebilir.
+                    //TODO: devam edebilir..
                 }
                 var model = new LoginViewModel()
                 {
@@ -388,8 +390,8 @@ namespace ECommerceLiteUI.Controllers
                 {
                     To = theUser.Email,
                     Subject = "ECommerceLite Site-Password Changed.",
-                    Message = $"Hi {theUser.Name} {theUser.Surname} <br/>New Password: <b>{randomPassword}</b>" +
-                    $"Click <b><a href='{siteUrl}/Account/Login?email={theUser.UserName}'>HERE</a></b> to login to the system."
+                    Message = $"Hi {theUser.Name} {theUser.Surname} <br/>New Password:  <b>{randomPassword}</b> <br/>" +
+                    $"Click  <b><a href='{siteUrl}/Account/Login?email={theUser.UserName} '>HERE</a></b> to login to the system."
                 });
                 ViewBag.TheResult = "Your new password has been sent to your e-mail address.";
                 return View();
