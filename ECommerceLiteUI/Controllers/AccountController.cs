@@ -259,7 +259,19 @@ namespace ECommerceLiteUI.Controllers
         [HttpGet]
         public ActionResult UpdatePassword()
         {
+            var theUser = myUserManager.FindById(HttpContext.User.Identity.GetUserId());
 
+            if (theUser != null)
+            {
+                ProfileViewModel model = new ProfileViewModel()
+                {
+                    Name = theUser.Name,
+                    Surname = theUser.Surname,
+                    Email = theUser.Email,
+                    Username = theUser.UserName
+                };
+                return View(model);
+            }
             return View();
         }
 
@@ -282,7 +294,7 @@ namespace ECommerceLiteUI.Controllers
                 var theUser = myUserManager
                     .FindById(HttpContext.User.Identity.GetUserId());
 
-                var theCheckUser = myUserManager.Find(theUser.UserName, model.OldPassword);
+                var theCheckUser = myUserManager.Find(theUser.UserName, model.CurrentPassword);
 
                 if (theCheckUser == null)
                 {
@@ -292,8 +304,7 @@ namespace ECommerceLiteUI.Controllers
                 }
 
                 await myUserStore.SetPasswordHashAsync(theUser, myUserManager.PasswordHasher.HashPassword(model.NewPassword));
-                await myUserStore.UpdateAsync(theUser);
-                await myUserStore.Context.SaveChangesAsync();
+                await myUserManager.UpdateAsync(theUser);
                 TempData["PasswordUpdated"] = "Your password has been changed.";
                 HttpContext.GetOwinContext().Authentication.SignOut();
                 return RedirectToAction("Login", "Account", new { email = theUser.Email });
@@ -335,13 +346,22 @@ namespace ECommerceLiteUI.Controllers
                     ModelState.AddModelError("", "Cannot process because the user is not found!");  //Kullanıcı bulunamadığı için işlem yapılamıyor.
                     return View(model);
                 }
+                //buraya
+                
+                if (myUserManager.PasswordHasher.VerifyHashedPassword(theUser.PasswordHash, model.CurrentPassword)
+                    == PasswordVerificationResult.Failed)
+                {
+                    ModelState.AddModelError("", "We can't update your information because you entered your current password incorrectly!");
+                    return View(model);
+                }
+
+
 
                 theUser.Name = model.Name;
                 theUser.Surname = model.Surname;
                 //TODO: telefon numarası eklenebilir.
 
-                await myUserStore.UpdateAsync(theUser);
-                await myUserStore.Context.SaveChangesAsync();
+                await myUserManager.UpdateAsync(theUser);
                 ViewBag.TheResult = "Your information has been updated.";
                 var newModel = new ProfileViewModel()
                 {

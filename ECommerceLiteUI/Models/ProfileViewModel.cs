@@ -21,9 +21,9 @@ namespace ECommerceLiteUI.Models
         [EmailAddress]
         public string Email { get; set; }
 
-        [Display(Name = "Old Password")]
+        [Display(Name = "Current Password")]
         [DataType(DataType.Password)]
-        public string OldPassword { get; set; }
+        public string CurrentPassword { get; set; }
         [StringLength(100)]
         [Display(Name = "New Password")]
         [DataType(DataType.Password)]
