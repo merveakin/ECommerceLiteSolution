@@ -5,11 +5,10 @@
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h2>All Categories</h2>
-<br />
+
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Category List</h3>
+        <a href="/Category/Create" class="btn btn-warning">Create New Category</a>
     </div>
     <!-- /.card-header -->
     <div class="card-body">
@@ -33,11 +32,9 @@
                                margin-right:5px">Edit</a>
                             <a href="/Category/Delete/@item.Id" class="btn btn-sm btn-default" style="background-color:brown;
                                margin-right:5px">Delete</a>
-                            <a href="/Category/ProductList/@item.Id" class="btn btn-sm btn-default" style="background-color:rosybrown;
-                               margin-right:5px">Subcategories</a>
-
+                            <a href="/Category/SubCategoryList/@item.Id" class="btn btn-sm btn-default" style="background-color:rosybrown;
+                               margin-right:5px">SubCategories</a>
                         </td>
-
                     </tr>
                 }
             </tbody>
