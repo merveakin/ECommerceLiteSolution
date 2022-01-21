@@ -1,0 +1,67 @@
+﻿@using ECommerceLiteEntity.Models
+@model List<Category>
+@{
+    ViewBag.Title = "CategoryList";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h2>All Categories</h2>
+<br />
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Category List</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="example1" class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Description Of Category</th>
+                    <th>Processes</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.CategoryName</td>
+                        <td>@item.CategoryDescription</td>
+                        <td>
+                            <a href="/Category/Edit/@item.Id" class="btn btn-sm btn-default" style="background-color:burlywood;
+                               margin-right:5px">Edit</a>
+                            <a href="/Category/Delete/@item.Id" class="btn btn-sm btn-default" style="background-color:brown;
+                               margin-right:5px">Delete</a>
+                            <a href="/Category/ProductList/@item.Id" class="btn btn-sm btn-default" style="background-color:rosybrown;
+                               margin-right:5px">Subcategories</a>
+
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Description Of Category</th>
+                    <th>Processes</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+</div>
+
+@section scripts{
+    <script>
+        $(function () {
+            $("#example1").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+            });
+        });
+    </script>
+
+}
+

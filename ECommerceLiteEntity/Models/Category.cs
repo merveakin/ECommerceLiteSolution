@@ -17,7 +17,7 @@ namespace ECommerceLiteEntity.Models
         [StringLength(500, ErrorMessage = "The length of the category description must not exceed 500 characters!")]
         public string CategoryDescription { get; set; }
 
-        public int BaseCategoryId { get; set; }
+        public int? BaseCategoryId { get; set; }
         [ForeignKey("BaseCategoryId")]
         public virtual Category BaseCategory { get; set; }
         public virtual List<Product> ProductList { get; set; }
