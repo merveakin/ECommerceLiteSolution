@@ -18,7 +18,6 @@
                     <th>Category Name</th>
                     <th>Description Of Category</th>
                     <th>Processes</th>
-
                 </tr>
             </thead>
             <tbody>
@@ -32,7 +31,10 @@
                                margin-right:5px">Edit</a>
                             <a href="/Category/Delete/@item.Id" class="btn btn-sm btn-default" style="background-color:brown;
                                margin-right:5px">Delete</a>
-                            <a href="/Category/SubCategoryList/@item.Id" class="btn btn-sm btn-default" style="background-color:rosybrown;
+
+                            <a href="/Category/SubCategoryList?id=@item.Id&IsSendFromSubCategory=true"
+                               class="btn btn-sm btn-default"
+                               style="background-color:rosybrown;
                                margin-right:5px">SubCategories</a>
                         </td>
                     </tr>

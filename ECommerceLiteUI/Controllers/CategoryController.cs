@@ -19,15 +19,17 @@ namespace ECommerceLiteUI.Controllers
             ViewBag.CategoryCount = allCategories.Count;
             return View(allCategories);
         }
-
-        public ActionResult Create(int? id)
+        public ActionResult Create(int? id, bool IsSendFromSubCategory = false)
         {
+            ViewBag.CategoryName = string.Empty;
             if (id != null)
             {
                 Category model = new Category()
                 {
                     Id = id.Value
                 };
+                ViewBag.CategoryName =
+                    myCategoryRepo.GetById(id.Value).CategoryName;
                 return View(model);
             }
             return View();
@@ -58,15 +60,14 @@ namespace ECommerceLiteUI.Controllers
                     newCategory.BaseCategoryId = model.Id;
                 }
                 int insertResult = myCategoryRepo.Insert(newCategory);
-                if (model.Id > 0
-                    && model.Id == 0)
+                if (insertResult > 0 && model.Id == 0)
                 {
                     return RedirectToAction("CategoryList", "Category");
                 }
 
                 else if (insertResult > 0 && model.Id > 0)
                 {
-                    return RedirectToAction("SubCategoryList", "Category", new { id=model.Id});
+                    return RedirectToAction("SubCategoryList", "Category", new { id = model.Id });
                 }
 
                 else
@@ -76,13 +77,11 @@ namespace ECommerceLiteUI.Controllers
             }
             catch (Exception ex)
             {
-
                 ModelState.AddModelError("", "Unexpected Error! Try Again! HATA :" + ex.Message);
                 //TODO : Ex loglanacak
                 return View(model);
             }
         }
-
         public ActionResult SubCategoryList(int id)
         {
             var subCategories = myCategoryRepo.Queryable().Where(x => x.BaseCategoryId != null
@@ -93,6 +92,5 @@ namespace ECommerceLiteUI.Controllers
             ViewBag.CategoryCount = subCategories.Count;
             return View(subCategories);
         }
-
     }
 }

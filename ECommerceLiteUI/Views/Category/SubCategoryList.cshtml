@@ -4,7 +4,7 @@
     ViewBag.Title = "SubCategoryList";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
-<h4>@ViewBag.CategoryName Kategorisinin Alt Kategorileri</h4>
+<h4>Sub-Categories of Category @ViewBag.CategoryName</h4>
 <hr />
 <div class="col-12">
     <div class="card">
@@ -37,6 +37,10 @@
                     }
                 </tbody>
             </table>
+            <hr />
+            <a href="/Category/CategoryList" class="btn btn-secondary" style=" margin-right:5px;">
+                Back to Category
+            </a>
         </div>
     </div>
 </div>
