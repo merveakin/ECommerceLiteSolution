@@ -5,6 +5,10 @@ using System.Web;
 using System.Web.Mvc;
 using ECommerceLiteEntity.Models;
 using ECommerceLiteBLL.Repository;
+using ECommerceLiteUI.Models;
+using Mapster;
+using ECommerceLiteBLL.Settings;
+using System.IO;
 
 namespace ECommerceLiteUI.Controllers
 {
@@ -13,7 +17,7 @@ namespace ECommerceLiteUI.Controllers
         //GLOBAL ZONE
         ProductRepo myProductRepo = new ProductRepo();
         CategoryRepo myCategoryRepo = new CategoryRepo();
-
+        ProductPictureRepo myProductPictureRepo = new ProductPictureRepo();
 
         public ActionResult ProductList()
         {
@@ -37,31 +41,121 @@ namespace ECommerceLiteUI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Product model)
+        public ActionResult Create(ProductViewModel model)
         {
             try
             {
+                List<SelectListItem> allCategories = new List<SelectListItem>();
+                myCategoryRepo.GetAll().ForEach(x => allCategories.Add(new SelectListItem()
+                {
+                    Text = x.CategoryName,
+                    Value = x.Id.ToString()
+                }));
+                ViewBag.CategoryList = allCategories;
+
                 if (!ModelState.IsValid)
                 {
                     ModelState.AddModelError("", "Data entries must be correct!");
                     return View(model);
                 }
-                int insertResult = myProductRepo.Insert(model);
+
+                //Mapleme yapıldı.
+                Product newProduct = model.Adapt<Product>();
+                int insertResult = myProductRepo.Insert(newProduct);
                 if (insertResult > 0)
                 {
-                    return RedirectToAction("ProductList", "Product");
+                    //Ürünün fotoğrafları eklensin
+                    if (model.Files.Any())
+                    {
+                        ProductPicture productPicture = new ProductPicture();
+                        productPicture.ProductId = newProduct.Id;
+                        productPicture.RegisterDate = DateTime.Now;
+                        int counter = 1;
+                        foreach (var item in model.Files)
+                        {
+                            if (item != null && item.ContentType.Contains("image") && item.ContentLength > 0)
+                            {
+
+                                string filename =
+                                    SiteSettings.UrlFormatConverter(model.ProductName).ToLower().Replace("-", "");
+                                string extName = Path
+                                    .GetExtension(item.FileName);
+
+                                string guid = Guid.NewGuid()
+                                    .ToString().Replace("-", "");
+                                var directoryPath = Server.MapPath($"~/ProductPictures/{filename}/{model.ProductCode}");
+                                var filePath = Server.MapPath($"~/ProductPictures/{filename}/{model.ProductCode}/") + filename + counter + "-" + guid + extName;
+                                if (!Directory.Exists(directoryPath))
+                                {
+                                    Directory.CreateDirectory(directoryPath);
+                                }
+                                item.SaveAs(filePath);
+                                if (counter == 1)
+                                {
+                                    productPicture.ProductPicture1
+                                        = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+
+                                }
+                                if (counter == 2)
+                                {
+                                    productPicture.ProductPicture2
+                                        = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+
+                                }
+                                if (counter == 3)
+                                {
+                                    productPicture.ProductPicture3
+                                        = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+
+                                }
+                                if (counter == 4)
+                                {
+                                    productPicture.ProductPicture4
+                                        = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+
+                                }
+                                if (counter == 5)
+                                {
+                                    productPicture.ProductPicture5
+                                        = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+
+                                }
+                            }
+                            counter++;
+                        }
+
+                        int pictureInsertResult = myProductPictureRepo.Insert(productPicture);
+                        if (pictureInsertResult > 0)
+                        {
+                            return RedirectToAction("ProductList", "Product");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "The product has been added, but an error occurred while adding the photos of the product! Try again to add a photo!");
+                            return View(model);
+                        }
+                    }
+                    else
+                    {
+                        return RedirectToAction("ProductList", "Product");
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Error occurred while adding product! Try Again!");
+                    ModelState.AddModelError("", "Error occurred while adding a product!Try Again!");
+                    //ex loglanacak
                     return View(model);
                 }
+
+
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Unexpected Error!");
-                //TODO : ex loglanacak..
-                return View();
+
+                ModelState.AddModelError("", "Unexpected error occurred!");
+                //ex loglanacak
+                return View(model);
+
             }
         }
     }
