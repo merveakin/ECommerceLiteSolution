@@ -2370,6 +2370,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\_PartialUserNameSurnameOnHomePage.cshtml" />
     <Content Include="Views\Shared\_PartialShoppingCart.cshtml" />
+    <Content Include="Views\Home\Order.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

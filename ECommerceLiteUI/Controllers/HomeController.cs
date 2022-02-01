@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using ECommerceLiteBLL.Repository;
 using Mapster;
 using ECommerceLiteUI.Models;
+using ECommerceLiteEntity.Models;
+using ECommerceLiteBLL.Account;
 
 namespace ECommerceLiteUI.Controllers
 {
@@ -14,7 +16,9 @@ namespace ECommerceLiteUI.Controllers
         //GLOBAL ZONE
         CategoryRepo myCategoryRepo = new CategoryRepo();
         ProductRepo myProductRepo = new ProductRepo();
-
+        OrderRepo myOrderRepo = new OrderRepo();
+        OrderDetailRepo myOrderDetailRepo = new OrderDetailRepo();
+        CustomerRepo myCustomerRepo = new CustomerRepo();
 
         public ActionResult Index()
         {
@@ -57,7 +61,7 @@ namespace ECommerceLiteUI.Controllers
             {
                 var shoppingCart =
                     Session["ShoppingCart"] as List<CartViewModel>;
-                if (shoppingCart==null)
+                if (shoppingCart == null)
                 {
                     shoppingCart = new List<CartViewModel>();
                 }
@@ -70,7 +74,7 @@ namespace ECommerceLiteUI.Controllers
                         return RedirectToAction("Index", "Home");
                     }
 
-                    var productAddtoCart = product.Adapt <CartViewModel> ();
+                    var productAddtoCart = product.Adapt<CartViewModel>();
                     if (shoppingCart.Count(x => x.Id == productAddtoCart.Id) > 0)
                     {
                         shoppingCart.FirstOrDefault(x => x.Id == productAddtoCart.Id).Quantity++;
@@ -83,10 +87,10 @@ namespace ECommerceLiteUI.Controllers
                     }
 
                     Session["ShoppingCart"] = shoppingCart;
-                    TempData["AddToCart"]= "Product added";
+                    TempData["AddToCart"] = "Product added";
                 }
 
-                return RedirectToAction("Index","Home");
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
@@ -96,6 +100,115 @@ namespace ECommerceLiteUI.Controllers
             }
         }
 
+        [Authorize]
+        public ActionResult Buy()
+        {
+            try
+            {
+                var shoppingCart =
+                    Session["ShoppingCart"] as List<CartViewModel>;
+                if (shoppingCart != null)
+                {
+                    if (shoppingCart.Count > 0)
+                    {
+                        //
+                        var user = MembershipTools.GetUser();
+                        var customer = myCustomerRepo.Queryable().FirstOrDefault(x => x.UserId == user.Id);
+
+                        Order newOrder =
+                            new Order()
+                            {
+                                CustomerTCNumber =
+                                customer.TCNumber,
+                                RegisterDate = DateTime.Now,
+                                OrderNumber = "1234567"
+                            };
+                        int orderInsertResult = myOrderRepo.Insert(newOrder);
+
+                        if (orderInsertResult > 0)
+                        {
+                            foreach (var item in shoppingCart)
+                            {
+                                OrderDetail newOrderDetail = new OrderDetail()
+                                {
+                                    OrderId = newOrder.Id,
+                                    ProductId = item.Id,
+                                    Discount = 0,
+                                    ProductPrice = item.Price,
+                                    Quantity = item.Quantity,
+                                    RegisterDate = DateTime.Now
+                                };
+                                if (newOrderDetail.Discount > 0)
+                                {
+                                    newOrderDetail.TotalPrice = newOrderDetail.Quantity * (newOrderDetail.ProductPrice - (newOrderDetail.ProductPrice * Convert.ToDecimal(newOrderDetail.Discount / 100)));
+                                }
+
+                                else
+                                {
+                                    newOrderDetail.TotalPrice = newOrderDetail.TotalPrice =
+                                        newOrderDetail.Quantity * newOrderDetail.ProductPrice;
+                                }
+
+                                int detailInsertResult = myOrderDetailRepo.Insert(newOrderDetail);
+
+                                if (detailInsertResult > 0)
+                                {
+                                    return RedirectToAction("Order", "Home", new { id = newOrder.Id });
+                                }
+                            }
+                        }
+                    }
+                }
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                //ex loglanacak
+                //TempData ile sonuç anasayfaya gönderilebilir.
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [Authorize]
+        public ActionResult Order(int id)
+        {
+            try
+            {
+                if (id > 0)
+                {
+                    Order customerOrder = myOrderRepo.GetById(id);
+                    List<OrderDetail> orderDetails =
+                        new List<OrderDetail>();
+                    if (customerOrder != null)
+                    {
+                        orderDetails =
+                            myOrderDetailRepo.Queryable().Where(x => x.OrderId == customerOrder.Id).ToList();
+                        foreach (var item in orderDetails)
+                        {
+                            item.Product = myProductRepo.GetById(item.ProductId);
+                        }
+                        ViewBag.OrderSuccess = "Your order has been successfully created.";
+                        return View(orderDetails);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Product not found! TRY AGAIN!");
+                        return View(orderDetails);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Product not found! TRY AGAIN!");
+                    return View(new List<OrderDetail>());
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Unexpected error occurred!");
+                //ex loglanacak
+                return View(new List<OrderDetail>());
+            }
+        }
 
     }
 }
