@@ -3,25 +3,20 @@
 
 @if (Model != null)
 {
-    @*<li><a href="/Account/UserProfile"><i class="fa fa-user-o"></i>@Model.Name @Model.Surname</a></li>*@
+    <li>
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user-o"></i>@Model.Name @Model.Surname</a>
 
-
-<li>
-    <div class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user-o"></i>@Model.Name @Model.Surname</a>
-
-        <ul class="dropdown-menu" style="background-color:#15161d;">
-            <li><a href="/Account/UserProfile" style="color: #d10024; font-weight: bold;">
-    <i class="fa fa-user-o"></i>Account Info</a></li>
-            <li><a href="/Home/Order" style="color: #d10024; font-weight: bold;"><i class="fa fa-shopping-cart"></i>My Orders</a></li>
-        </ul>
-    </div>
-</li>
-
-
-
-
-
+            <ul class="dropdown-menu" style="background-color:#15161d;">
+                <li>
+                    <a href="/Account/UserProfile" style="color: #d10024; font-weight: bold;">
+                        <i class="fa fa-user-o"></i>Account Info
+                    </a>
+                </li>
+                <li><a href="/Home/Order" style="color: #d10024; font-weight: bold;"><i class="fa fa-shopping-cart"></i>My Orders</a></li>
+            </ul>
+        </div>
+    </li>
 }
 else
 {

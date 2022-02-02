@@ -1,0 +1,45 @@
+﻿@using ECommerceLiteEntity.ViewModels
+@model List<ProductCountModel>
+
+@{
+    ViewBag.Title = "CategoryProducts";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h2>Temel Kategorilerde Bulunan Ürün Sayıları</h2>
+
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">
+
+        </div>
+
+        <div class="card-body>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Category Name</th>
+                        <th>Number of Product</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <button class="btn btn-sm btn-success">
+                                @item.BaseCategory.CategoryName
+                                </button>
+                            </td>
+                            
+                            <td>
+                                @item.ProductCount
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
