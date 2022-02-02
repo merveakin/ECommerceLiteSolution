@@ -182,8 +182,14 @@ namespace ECommerceLiteUI.Controllers
                                 {
                                     message += $"<tr><td>{myProductRepo.GetById(item.ProductId).ProductName}</td><td>{item.Quantity}</td><td>{item.TotalPrice}</td></tr>";
                                 }
-                                message += "</table><br/>Siparişinize ait QR kodunuz: <br/><br/>";
-                                message += $"<a href='/Home/Order/{newOrder.Id}'><img src=\"{qrUri}\" height=250px;  width=250px; class='img-thumbnail' /></a>";
+
+                                string siteUrl =
+                       Request.Url.Scheme + Uri.SchemeDelimiter
+                       + Request.Url.Host
+                       + (Request.Url.IsDefaultPort ? "" : ":" + Request.Url.Port);
+
+                                message += "</table><br/>Your QR code for your order: < br/><br/>";
+                                message += $"<a href='{siteUrl}/Home/Order/{newOrder.Id}'><img src=\"{qrUri}\" height=250px;  width=250px; class='img-thumbnail' /></a>";
                                 await SiteSettings.SendMail(new MailModel()
                                 {
                                     To = user.Email,
@@ -212,18 +218,18 @@ namespace ECommerceLiteUI.Controllers
             }
         }
 
-        
-
         [Authorize]
         public ActionResult Order(int? id)
         {
             try
             {
+                List<OrderDetail> orderDetails =
+                        new List<OrderDetail>();
                 if (id > 0)
                 {
-                    Order customerOrder = myOrderRepo.GetById(id.Value);
-                    List<OrderDetail> orderDetails =
-                        new List<OrderDetail>();
+                    Order customerOrder = 
+                        myOrderRepo.GetById(id.Value);
+                    
                     if (customerOrder != null)
                     {
                         orderDetails =
@@ -244,8 +250,29 @@ namespace ECommerceLiteUI.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Product not found! TRY AGAIN!");
-                    return View(new List<OrderDetail>());
+                    //logged in user
+                    var user = MembershipTools.GetUser();
+                    //customer
+                    var customer = myCustomerRepo.Queryable()
+                        .FirstOrDefault(x => x.UserId == user.Id);
+                    //orders
+                    var orderList = myOrderRepo.Queryable()
+                        .Where(x => x.CustomerTCNumber == customer.TCNumber).ToList();
+                    
+                    orderList=orderList.Where(x => x.RegisterDate >= DateTime.Now.AddMonths(-1)).ToList();
+
+
+
+
+                    //order details
+                    foreach (var item in orderList)
+                    {
+                        var detailList =
+                            myOrderDetailRepo.Queryable()
+                            .Where(x => x.OrderId == item.Id).ToList();
+                        orderDetails.AddRange(detailList);
+                    }
+                    return View(orderDetails.OrderByDescending(x=>x.RegisterDate).ToList());
                 }
             }
             catch (Exception ex)
@@ -255,6 +282,5 @@ namespace ECommerceLiteUI.Controllers
                 return View(new List<OrderDetail>());
             }
         }
-
     }
 }
