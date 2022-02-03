@@ -1,25 +1,25 @@
 ﻿@using ECommerceLiteEntity.ViewModels
 @model List<ProductCountModel>
-
 @{
     ViewBag.Title = "CategoryProducts";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h2>Temel Kategorilerde Bulunan Ürün Sayıları</h2>
+<h2>
+    Number of Products in Main Categories
+</h2>
 
 <div class="col-md-12">
     <div class="card">
         <div class="card-header">
 
         </div>
-
-        <div class="card-body>
+        <div class="card-body">
             <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Category Name</th>
-                        <th>Number of Product</th>
+                        <th>Number of Products</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,11 +27,8 @@
                     {
                         <tr>
                             <td>
-                                <button class="btn btn-sm btn-success">
-                                @item.BaseCategory.CategoryName
-                                </button>
+                                <button class="btn btn-sm btn-success">@item.BaseCategory.CategoryName</button>
                             </td>
-                            
                             <td>
                                 @item.ProductCount
                             </td>
@@ -43,3 +40,4 @@
 
     </div>
 </div>
+

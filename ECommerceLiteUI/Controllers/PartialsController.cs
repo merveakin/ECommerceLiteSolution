@@ -14,7 +14,7 @@ namespace ECommerceLiteUI.Controllers
     {
         //GLOBAL ZONE
         CategoryRepo myCategoryRepo = new CategoryRepo();
-
+        ProductRepo myProductRepo = new ProductRepo();
 
         public PartialViewResult AdminSideBarResult()
         {
@@ -33,7 +33,7 @@ namespace ECommerceLiteUI.Controllers
                 var loggedInUser = MembershipTools.GetUser();
                 return PartialView("_PartialUserNameSurnameOnHomePage", loggedInUser);
             }
-            return PartialView("_PartialUserNameSurnameOnHomePage",null);
+            return PartialView("_PartialUserNameSurnameOnHomePage", null);
         }
         public PartialViewResult ShoppingCart()
         {
@@ -41,12 +41,12 @@ namespace ECommerceLiteUI.Controllers
 
             if (shoppingCart == null)
             {
-                return PartialView("_PartialShoppingCart",new List<CartViewModel>());
+                return PartialView("_PartialShoppingCart", new List<CartViewModel>());
             }
 
             else
             {
-                return PartialView("_PartialShoppingCart",shoppingCart);
+                return PartialView("_PartialShoppingCart", shoppingCart);
             }
         }
         public PartialViewResult AdminSideBarCategories()
@@ -56,6 +56,11 @@ namespace ECommerceLiteUI.Controllers
                 .Where(x => x.BaseCategory == null).ToList().Count;
 
             return PartialView("_PartialAdminSideBarCategories");
+        }
+        public PartialViewResult AdminSideBarProducts()
+        {
+            TempData["CategoryProductsCount"] = myProductRepo.GetAll().Count;
+            return PartialView("_PartialAdminSideBarProducts");
         }
     }
 }

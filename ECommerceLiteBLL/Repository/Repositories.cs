@@ -12,21 +12,20 @@ namespace ECommerceLiteBLL.Repository
     {
 
     }
+
     public class CategoryRepo : RepositoryBase<Category, int>
     {
         public List<ProductCountModel> GetBaseCategoriesProductCount()
         {
             List<ProductCountModel> list = new List<ProductCountModel>();
             dbContext = new ECommerceLiteDAL.MyContext();
-            var categoryList = from c in dbContext.Categories
-                               where c.BaseCategoryId == null
-                               select c;
+            var categoryList = this.Queryable()
+                .Where(x => x.BaseCategoryId == null).ToList();
             foreach (var item in categoryList)
             {
-                //sub category
-                var subCategoryList = from c in dbContext.Categories
-                                      where c.BaseCategoryId == item.Id
-                                      select c;
+                //sub categoryleri
+                var subCategoryList = this.Queryable()
+                .Where(x => x.BaseCategoryId == item.Id).ToList();
 
                 int productCount = 0;
                 foreach (var subitem in subCategoryList)
@@ -44,6 +43,8 @@ namespace ECommerceLiteBLL.Repository
             }
             return list;
         }
+
+
     }
     public class ProductRepo : RepositoryBase<Product, int> { }
     public class OrderRepo : RepositoryBase<Order, int> { }
