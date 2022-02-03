@@ -36,6 +36,7 @@ namespace ECommerceLiteUI.Controllers
                     .Where(x => x.ProductName.Contains(search)).ToList();
             }
 
+
             return View(allProductList.ToPagedList(page, 3));
         }
 
