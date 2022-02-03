@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ECommerceLiteEntity.Models;
 using ECommerceLiteEntity.ViewModels;
+using Mapster;
 
 namespace ECommerceLiteBLL.Repository
 {
@@ -21,13 +22,22 @@ namespace ECommerceLiteBLL.Repository
             dbContext = new ECommerceLiteDAL.MyContext();
             var categoryList = this.Queryable()
                 .Where(x => x.BaseCategoryId == null).ToList();
+           
+
             foreach (var item in categoryList)
             {
+                int productCount = 0;
+                #region Ana Kategori için
+                //Eğer bizim müşterimiz ana kategorilere ürün eklemeye izin verdiyse burada oluşan bug'ı aşağıdaki satırla çözeriz.
+                var baseCategoryProductList = from p in dbContext.Products
+                                              where p.CategoryId == item.Id
+                                              select p;
+                productCount = baseCategoryProductList.ToList().Count;
+                #endregion
                 //sub categoryleri
                 var subCategoryList = this.Queryable()
                 .Where(x => x.BaseCategoryId == item.Id).ToList();
 
-                int productCount = 0;
                 foreach (var subitem in subCategoryList)
                 {
                     var productList = from p in dbContext.Products
@@ -37,14 +47,13 @@ namespace ECommerceLiteBLL.Repository
                 }
                 list.Add(new ProductCountModel()
                 {
-                    BaseCategory = item,
+                    BaseCategory = item.Adapt<CategoryViewModel>(),
+                    BaseCategoryName = item.CategoryName,
                     ProductCount = productCount
                 });
             }
             return list;
         }
-
-
     }
     public class ProductRepo : RepositoryBase<Product, int> { }
     public class OrderRepo : RepositoryBase<Order, int> { }

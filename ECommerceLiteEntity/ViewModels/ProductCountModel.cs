@@ -9,7 +9,9 @@ namespace ECommerceLiteEntity.ViewModels
 {
     public class ProductCountModel
     {
-        public Category BaseCategory { get; set; }
+
+        public CategoryViewModel BaseCategory { get; set; }
+        public string BaseCategoryName { get; set; }
         public int ProductCount { get; set; }
     }
 }

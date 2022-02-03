@@ -42,13 +42,15 @@ namespace ECommerceLiteUI.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            List<SelectListItem> allCategories = new List<SelectListItem>();
-            myCategoryRepo.GetAll().ForEach(x => allCategories.Add(new SelectListItem()
+            List<SelectListItem> subCategories = new List<SelectListItem>();
+            myCategoryRepo.Queryable()
+                .Where(x => x.BaseCategoryId != null).ToList()
+                .ForEach(x => subCategories.Add(new SelectListItem()
             {
                 Text = x.CategoryName,
                 Value = x.Id.ToString()
             }));
-            ViewBag.CategoryList = allCategories;
+            ViewBag.CategoryList = subCategories;
             return View();
         }
 
@@ -58,13 +60,15 @@ namespace ECommerceLiteUI.Controllers
         {
             try
             {
-                List<SelectListItem> allCategories = new List<SelectListItem>();
-                myCategoryRepo.GetAll().ForEach(x => allCategories.Add(new SelectListItem()
+                List<SelectListItem> subCategories = new List<SelectListItem>();
+                myCategoryRepo.Queryable()
+                    .Where(x => x.BaseCategoryId != null).ToList()
+                    .ForEach(x => subCategories.Add(new SelectListItem()
                 {
                     Text = x.CategoryName,
                     Value = x.Id.ToString()
                 }));
-                ViewBag.CategoryList = allCategories;
+                ViewBag.CategoryList = subCategories;
 
                 if (!ModelState.IsValid)
                 {
@@ -159,8 +163,6 @@ namespace ECommerceLiteUI.Controllers
                     //ex loglanacak
                     return View(model);
                 }
-
-
             }
             catch (Exception ex)
             {
