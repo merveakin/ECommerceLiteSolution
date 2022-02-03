@@ -25,11 +25,11 @@
         <div class="form-group">
             @if (string.IsNullOrEmpty(ViewBag.CategoryName))
             {
-                @Html.Label("Kategori Adı")
+                @Html.Label("Category Name")
             }
             else
             {
-                @Html.Label("Alt Kategori Adı")
+                @Html.Label("Sub-Category Name")
             }
             @Html.TextBoxFor(model => model.CategoryName, new { @class = "form-control" })
             @Html.ValidationMessageFor(model => model.CategoryName, "", new { @class = "text-danger" })
