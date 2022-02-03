@@ -13,7 +13,7 @@
     @using (Html.BeginForm("ProductList", "Product", FormMethod.Get))
     {
         <p>
-            Ürün Adı: @Html.TextBox("search")
+            Product Name: @Html.TextBox("search")
             <input type="submit" value="Ara" class="btn btn-info btn-sm" />
         </p>
     }
@@ -28,13 +28,13 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Ürün Adı</th>
-                        <th>Kayıt Tarihi</th>
-                        <th>Ürün Açıklaması</th>
-                        <th>Kategorisi</th>
-                        <th>Birim Fiyatı</th>
-                        <th>Stok Adedi</th>
-                        <th>İşlemler</th>
+                        <th>Product Name</th>
+                        <th>Register Date</th>
+                        <th>Product Description</th>
+                        <th>Category</th>
+                        <th>Unit Price</th>
+                        <th>Stock Quantity</th>
+                        <th>Proccess</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,8 +52,8 @@
                             <td>@item.Price ₺ </td>
                             <td>@item.Quantity </td>
                             <td>
-                                <a href="/Product/Edit/@item.Id" class="btn btn-sm btn-warning" style=" margin-right:5px;">Düzenle</a>
-                                <a href="/Product/Delete/@item.Id" class="btn btn-sm btn-danger" style=" margin-right:5px;">Sil</a>
+                                <a href="/Product/Edit/@item.Id" class="btn btn-sm btn-warning" style=" margin-right:5px;">Edit</a>
+                                <a href="/Product/Delete/@item.Id" class="btn btn-sm btn-danger" style=" margin-right:5px;">Delete</a>
                             </td>
                         </tr>
                     }
@@ -80,6 +80,7 @@
                 {
                     <input type="hidden" name="Id" id="ProductId" class="form-control" />
                     <div class="col-md-12">
+                        @Html.AntiForgeryToken()
                         @Html.ValidationSummary(false, "", new { @class = "text-danger" })
                         <div class="form-group">
                             @Html.Label("Product Name")
@@ -113,3 +114,32 @@
     </div>
 </div>
 <!--Modal Bitiş-->
+
+
+@section scripts{
+    <script>
+        function ProductBtnClicked(id) {
+            console.log(id);
+            $.ajax({
+                type: "GET",
+                url: '/Product/GetProductDetails/' + id,
+                success: function (res) {
+                    if (res.isSuccess) {
+                        $('#ProductName').val(res.data.ProductName);
+                        $('#Description').val(res.data.Description);
+                        $('#ProductCode').val(res.data.ProductCode);
+                        $('#Price').val(res.data.Price);
+                        $('#Quantity').val(res.data.Quantity);
+                        $('#ProductId').val(res.data.Id);
+                    }
+                    else {
+
+                    }
+                },
+                error: function (err) {
+                    console.log(err);
+                },
+            });
+        }
+    </script>
+    }

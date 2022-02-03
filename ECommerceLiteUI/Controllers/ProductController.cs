@@ -31,12 +31,12 @@ namespace ECommerceLiteUI.Controllers
 
             else
             {
-                allProductList = 
+                allProductList =
                     myProductRepo.Queryable()
                     .Where(x => x.ProductName.Contains(search)).ToList();
             }
 
-            return View(allProductList.ToPagedList(page,3));
+            return View(allProductList.ToPagedList(page, 3));
         }
 
         [HttpGet]
@@ -46,10 +46,10 @@ namespace ECommerceLiteUI.Controllers
             myCategoryRepo.Queryable()
                 .Where(x => x.BaseCategoryId != null).ToList()
                 .ForEach(x => subCategories.Add(new SelectListItem()
-            {
-                Text = x.CategoryName,
-                Value = x.Id.ToString()
-            }));
+                {
+                    Text = x.CategoryName,
+                    Value = x.Id.ToString()
+                }));
             ViewBag.CategoryList = subCategories;
             return View();
         }
@@ -64,10 +64,10 @@ namespace ECommerceLiteUI.Controllers
                 myCategoryRepo.Queryable()
                     .Where(x => x.BaseCategoryId != null).ToList()
                     .ForEach(x => subCategories.Add(new SelectListItem()
-                {
-                    Text = x.CategoryName,
-                    Value = x.Id.ToString()
-                }));
+                    {
+                        Text = x.CategoryName,
+                        Value = x.Id.ToString()
+                    }));
                 ViewBag.CategoryList = subCategories;
 
                 if (!ModelState.IsValid)
@@ -186,6 +186,53 @@ namespace ECommerceLiteUI.Controllers
                 //03.02.2022 tarihinde (yarın) düzenlenecek.
                 return View();
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(ProductViewModel model)
+        {
+            try
+            {
+                var product = myProductRepo.GetById(model.Id);
+                product.ProductName = model.ProductName;
+                product.Description = model.Description;
+                product.Quantity = model.Quantity;
+                product.Price = model.Price;
+                if (model.Files.Any())
+                {
+                    //
+                }
+                int updateResult = myProductRepo.Update();
+                if (updateResult > 0)
+                {
+                    return RedirectToAction("ProductList", "Product");
+                }
+                else
+                {
+                    //geçici return
+                    return RedirectToAction("ProductList", "Product");
+                }
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("ProductList", "Product");
+
+                //ex loglanacak
+            }
+        }
+
+        public JsonResult GetProductDetails(int id)
+        {
+            var product = myProductRepo.GetById(id);
+            if (product != null)
+            {
+                var data = product.Adapt<ProductViewModel>();
+                return Json(new { isSuccess = true, data },
+                    JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { isSuccess = false },
+                JsonRequestBehavior.AllowGet);
         }
     }
 }
