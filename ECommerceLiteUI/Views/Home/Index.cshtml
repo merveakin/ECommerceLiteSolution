@@ -60,10 +60,22 @@
                                 {
                                     <img src="./img/product01.png" alt="">
                                 }
-                                <div class="product-label">
-                                    <span class="sale">-30%</span>
-                                    <span class="new">NEW</span>
-                                </div>
+
+
+                            <div class="product-label">
+
+
+                                @if (item.Quantity > 0)
+                                {
+                                    <span class="sale">STOCK</span>
+                                    <span class="new">@item.Quantity</span>
+                                }
+                                else
+                                {
+                                    <span class="new">NO STOCK</span>
+                                }
+
+                            </div>
                             </div>
                             <div class="product-body">
                                 <p class="product-category">@item.CategoryOfProduct.CategoryName</p>
@@ -84,8 +96,15 @@
                             </div>
                             <div class="add-to-cart">
                                 @*<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>*@
-                                <a href="/Home/AddToCart/@item.Id" class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i>ADD TO CART</a>
+                                @if (item.Quantity > 0)
+                                {
+                                    <a href="/Home/AddToCart/@item.Id" class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i>ADD TO CART</a>
+                                }
 
+                                else
+                                {
+                                    <span style="background-color:red;color:white;padding:3px;font-weight:bold;border:1px solid red;border-radius:10px;">No Stock</span>
+                                }
                             </div>
                         </div>
                         <!-- /product -->
