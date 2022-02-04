@@ -103,7 +103,7 @@ namespace ECommerceLiteUI.Controllers
                 if (insertResult > 0)
                 {
                     //Ürünün fotoğrafları eklensin
-                    if (model.Files.Any())
+                    if (model.Files.Count(x => x != null) > 0)
                     {
                         ProductPicture productPicture = new ProductPicture();
                         productPicture.ProductId = newProduct.Id;
@@ -232,77 +232,77 @@ namespace ECommerceLiteUI.Controllers
                 product.Quantity = model.Quantity;
                 product.Price = model.Price;
                 product.CategoryId = model.CategoryId;
-                //if (model.Files.Any())
-                //{
-                //    //Önce sildik
-                //    var pictureList =
-                //          myProductPictureRepo.Queryable()
-                //          .Where(x => x.ProductId == model.Id).ToList();
-                //    foreach (var item in pictureList)
-                //    {
-                //        myProductPictureRepo.Delete(item);
-                //    }
-                //    //sonra yeni eklediklerini oluşturacağız.
-                //    ProductPicture productPicture = new ProductPicture();
-                //    productPicture.ProductId = model.Id;
-                //    productPicture.RegisterDate = DateTime.Now;
-                //    int counter = 1;
-                //    foreach (var item in model.Files)
-                //    {
+                if (model.Files.Count(x => x != null) > 0)
+                {
+                    //Önce sildik
+                    var pictureList =
+                          myProductPictureRepo.Queryable()
+                          .Where(x => x.ProductId == model.Id).ToList();
+                    foreach (var item in pictureList)
+                    {
+                        myProductPictureRepo.Delete(item);
+                    }
+                    //sonra yeni eklediklerini oluşturacağız.
+                    ProductPicture productPicture = new ProductPicture();
+                    productPicture.ProductId = model.Id;
+                    productPicture.RegisterDate = DateTime.Now;
+                    int counter = 1;
+                    foreach (var item in model.Files)
+                    {
 
-                //        if (item != null && item.ContentType.Contains("image") && item.ContentLength > 0)
-                //        {
+                        if (item != null && item.ContentType.Contains("image") && item.ContentLength > 0)
+                        {
 
-                //            string filename = SiteSettings.UrlFormatConverter(model.ProductName).ToLower().Replace("-", "");
-                //            string extName = Path
-                //                .GetExtension(item.FileName);
+                            string filename = SiteSettings.UrlFormatConverter(model.ProductName).ToLower().Replace("-", "");
+                            string extName = Path
+                                .GetExtension(item.FileName);
 
-                //            string guid = Guid.NewGuid()
-                //                .ToString().Replace("-", "");
-                //            var directoryPath = Server.MapPath($"~/ProductPictures/{filename}/{model.ProductCode}");
-                //            var filePath = Server.MapPath($"~/ProductPictures/{filename}/{model.ProductCode}/") + filename + counter + "-" + guid + extName;
-                //            if (!Directory.Exists(directoryPath))
-                //            {
-                //                Directory.CreateDirectory(directoryPath);
-                //            }
-                //            item.SaveAs(filePath);
-                //            if (counter == 1)
-                //            {
-                //                productPicture.ProductPicture1 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
-                //            }
-                //            if (counter == 2)
-                //            {
-                //                productPicture.ProductPicture2 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
-                //            }
-                //            if (counter == 3)
-                //            {
-                //                productPicture.ProductPicture3 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
-                //            }
-                //            if (counter == 4)
-                //            {
-                //                productPicture.ProductPicture4 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
-                //            }
-                //            if (counter == 5)
-                //            {
-                //                productPicture.ProductPicture5 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
-                //            }
+                            string guid = Guid.NewGuid()
+                                .ToString().Replace("-", "");
+                            var directoryPath = Server.MapPath($"~/ProductPictures/{filename}/{model.ProductCode}");
+                            var filePath = Server.MapPath($"~/ProductPictures/{filename}/{model.ProductCode}/") + filename + counter + "-" + guid + extName;
+                            if (!Directory.Exists(directoryPath))
+                            {
+                                Directory.CreateDirectory(directoryPath);
+                            }
+                            item.SaveAs(filePath);
+                            if (counter == 1)
+                            {
+                                productPicture.ProductPicture1 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+                            }
+                            if (counter == 2)
+                            {
+                                productPicture.ProductPicture2 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+                            }
+                            if (counter == 3)
+                            {
+                                productPicture.ProductPicture3 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+                            }
+                            if (counter == 4)
+                            {
+                                productPicture.ProductPicture4 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+                            }
+                            if (counter == 5)
+                            {
+                                productPicture.ProductPicture5 = $"/ProductPictures/{filename}/{model.ProductCode}/" + filename + counter + "-" + guid + extName;
+                            }
 
 
-                //        }
-                //        counter++;
-                //    }
+                        }
+                        counter++;
+                    }
 
-                //    int pictureInsertResult =
-                //        myProductPictureRepo.Insert(productPicture);
-                //    if (pictureInsertResult == 0)
-                //    {
-                //        TempData["ProductModalError"] = "The product has been added, but an error occurred while adding the photos of the product.Try again to add a photo!";
-                //    }
-                //    else
-                //    {
-                //        TempData["ProductModalError"] = string.Empty;
-                //    }
-                //}
+                    int pictureInsertResult =
+                        myProductPictureRepo.Insert(productPicture);
+                    if (pictureInsertResult == 0)
+                    {
+                        TempData["ProductModalError"] = "The product has been added, but an error occurred while adding the photos of the product.Try again to add a photo!";
+                    }
+                    else
+                    {
+                        TempData["ProductModalError"] = string.Empty;
+                    }
+                }
 
                 int updateResult = myProductRepo.Update();
                 if (updateResult > 0)
