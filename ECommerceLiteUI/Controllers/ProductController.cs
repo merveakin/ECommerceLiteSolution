@@ -10,6 +10,7 @@ using Mapster;
 using ECommerceLiteBLL.Settings;
 using System.IO;
 using PagedList;
+using ECommerceLiteBLL.Account;
 
 namespace ECommerceLiteUI.Controllers
 {
@@ -20,7 +21,7 @@ namespace ECommerceLiteUI.Controllers
         CategoryRepo myCategoryRepo = new CategoryRepo();
         ProductPictureRepo myProductPictureRepo = new ProductPictureRepo();
 
-        public ActionResult ProductList(int page = 1, string search = "")
+        public ActionResult ProductList(int page = 1, string search = "", bool isNew = false)
         {
             List<Product> allProductList = new List<Product>();
 
@@ -36,7 +37,16 @@ namespace ECommerceLiteUI.Controllers
                     .Where(x => x.ProductName.Contains(search)).ToList();
             }
 
+            if (isNew)
+            {
+                allProductList = myProductRepo.GetAll();
+                allProductList = allProductList.Where(x =>
+                x.RegisterDate >= DateTime.Now.AddDays(-1)).ToList();
 
+            }
+
+            var user = MembershipTools.GetNameSurname();
+            LogManager.LogMessage("geldi", userInfo: user,pageInfo:"Product/ProductList");
             return View(allProductList.ToPagedList(page, 3));
         }
 
@@ -161,7 +171,7 @@ namespace ECommerceLiteUI.Controllers
                 else
                 {
                     ModelState.AddModelError("", "Error occurred while adding a product!Try Again!");
-                    //ex loglanacak
+                   //ex loglanacak
                     return View(model);
                 }
             }
@@ -169,7 +179,10 @@ namespace ECommerceLiteUI.Controllers
             {
 
                 ModelState.AddModelError("", "Unexpected error occurred!");
-                //ex loglanacak
+                //ex loglanacak++++
+                var user = MembershipTools.GetNameSurname();
+                LogManager.LogMessage(ex.ToString(),
+                    userInfo: user, pageInfo: "Product/Create");
                 return View(model);
 
             }
@@ -184,7 +197,10 @@ namespace ECommerceLiteUI.Controllers
             }
             catch (Exception ex)
             {
-                //03.02.2022 tarihinde (yarın) düzenlenecek.
+                var user = MembershipTools.GetNameSurname();
+                LogManager.LogMessage(ex.ToString(),
+                    userInfo: user, pageInfo: "Product/CategoryProducts");
+
                 return View();
             }
         }
@@ -217,9 +233,14 @@ namespace ECommerceLiteUI.Controllers
             }
             catch (Exception ex)
             {
+
+                //ex loglanacak+++
+                var user = MembershipTools.GetNameSurname();
+                LogManager.LogMessage(ex.ToString(),
+                    userInfo: user, pageInfo: "Product/Edit");
+
                 return RedirectToAction("ProductList", "Product");
 
-                //ex loglanacak
             }
         }
 
