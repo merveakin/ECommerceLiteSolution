@@ -12,7 +12,6 @@ namespace ECommerceLiteBLL.Settings
 {
     public static class SiteSettings
     {
-        //TODO : Mail'i webconfig dosyasından çekmeyi de öğreneceğiz.
         public static string SiteMail { get; set; } = "yazilim103@gmail.com";
         public static string SiteMailPassword { get; set; } = "betul103103";
         public static string SiteMailSmtpHost = "smtp.gmail.com";
@@ -93,8 +92,8 @@ namespace ECommerceLiteBLL.Settings
                 }
                 var theCredential = new NetworkCredential()
                 {
-                    UserName = SiteMail,
-                    Password = SiteMailPassword
+                    UserName = Constants.EmailAddress,
+                    Password = Constants.EmailPassword
                 };
 
                 AlternateView alternativeView = AlternateView.CreateAlternateViewFromString(htmlBody, null, MediaTypeNames.Text.Html);
